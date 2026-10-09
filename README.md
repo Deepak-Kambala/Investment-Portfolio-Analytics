@@ -469,6 +469,28 @@ cd backend  && uvicorn main:app --reload           # http://localhost:8000/docs
 cd frontend && npm install && npm run dev          # http://localhost:5173
 ```
 
+### Vercel deployment
+
+The root `vercel.json` deploys two services:
+
+- `frontend`: the Vite dashboard for all non-API paths.
+- `app`: the FastAPI service for `/api/*`.
+
+Before deploying, add `DATABASE_URL` in the Vercel project settings for the
+Production environment. Vercel does not upload the local `.env` file, so the
+FastAPI service cannot start without this variable. Use the direct Neon
+connection string (the host without `-pooler`) because the API sets a
+10-second PostgreSQL statement timeout.
+
+After deployment, verify:
+
+```bash
+curl -i https://YOUR_VERCEL_DOMAIN/api/health
+```
+
+The expected response is HTTP 200 with `{"status":"ok"}`. Never commit or
+paste the database password into source files or deployment logs.
+
 ### Likely interview questions this guide prepares you for
 
 | Question | Where to look |
