@@ -21,6 +21,13 @@ BEGIN
         RAISE EXCEPTION 'invalid side: %', p_side;
     END IF;
 
+    PERFORM 1 FROM accounts
+    WHERE account_id = p_account_id AND status = 'ACTIVE'
+    FOR UPDATE;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'account % not found or closed', p_account_id;
+    END IF;
+
     IF p_side = 'BUY' THEN
         SELECT cash_balance INTO v_cash FROM account_cash WHERE account_id = p_account_id;
         IF COALESCE(v_cash, 0) < v_amount + v_fee THEN

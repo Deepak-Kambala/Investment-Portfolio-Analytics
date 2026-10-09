@@ -1,9 +1,15 @@
 -- Reusable analytical layer. The API reads these instead of repeating the SQL.
 
 CREATE OR REPLACE VIEW latest_prices AS
-SELECT DISTINCT ON (security_id) security_id, price_date, close_price
-FROM market_prices
-ORDER BY security_id, price_date DESC;
+SELECT s.security_id, lp.price_date, lp.close_price
+FROM securities s
+CROSS JOIN LATERAL (
+    SELECT price_date, close_price
+    FROM market_prices m
+    WHERE m.security_id = s.security_id
+    ORDER BY price_date DESC
+    LIMIT 1
+) lp;
 
 CREATE OR REPLACE VIEW account_positions AS
 SELECT h.account_id,

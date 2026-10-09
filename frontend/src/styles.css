@@ -85,6 +85,8 @@ tbody tr:hover { background: rgba(109, 40, 217, .08); }
 .pager { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
 .msg { margin: 0; color: var(--muted); font-size: 24px; }
 .msg.bad { color: var(--sell); }
+.stale { opacity: .45; pointer-events: none; position: relative; }
+.stale > .msg { opacity: 1; color: var(--hi); pointer-events: auto; }
 .blink::after { content: "_"; animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 

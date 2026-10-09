@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { num, useApi, usdExact } from "../api.js";
 import { Async, DataTable, Panel } from "../ui.jsx";
 
@@ -11,6 +11,9 @@ export default function Transactions() {
   const securities = useApi("/securities");
   const t = useApi("/transactions", { ...f, limit: LIMIT, offset: page * LIMIT });
   const set = (k) => (e) => { setF({ ...f, [k]: e.target.value }); setPage(0); };
+  useEffect(() => {
+    if (t.data) setPage((current) => Math.min(current, Math.max(0, Math.ceil(t.data.total / LIMIT) - 1)));
+  }, [t.data?.total]);
 
   return (
     <>
@@ -51,9 +54,9 @@ export default function Transactions() {
                 ]}
               />
               <div className="pager">
-                <button disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button>
+                <button disabled={t.loading || page === 0} onClick={() => setPage(page - 1)}>Prev</button>
                 <span>Page {page + 1} of {Math.max(1, Math.ceil(d.total / LIMIT))}</span>
-                <button disabled={(page + 1) * LIMIT >= d.total} onClick={() => setPage(page + 1)}>Next</button>
+                <button disabled={t.loading || (page + 1) * LIMIT >= d.total} onClick={() => setPage(page + 1)}>Next</button>
               </div>
             </>
           )}

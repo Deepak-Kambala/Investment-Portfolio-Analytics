@@ -14,9 +14,16 @@ export function Panel({ title, children, aside }) {
 
 // Renders loading / error, or calls children(data) once data is there
 export function Async({ state, children }) {
-  if (state.error) return <p className="msg bad">{state.error.message}</p>;
+  if (state.error) return (
+    <>
+      <p className="msg bad">{state.error.message}</p>
+      <button onClick={state.reload}>Retry</button>
+    </>
+  );
   if (!state.data) return <p className="msg blink">Loading</p>;
-  return children(state.data);
+  return state.loading
+    ? <div className="stale"><p className="msg blink">Loading</p>{children(state.data)}</div>
+    : children(state.data);
 }
 
 export function Stat({ label, value, tone }) {

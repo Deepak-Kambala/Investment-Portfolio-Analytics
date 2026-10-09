@@ -52,6 +52,7 @@ def main():
         for table, col in ID_COLUMN.items():   # identity sequences must continue after the loaded ids
             conn.execute(f"SELECT setval(pg_get_serial_sequence('{table}', '{col}'), (SELECT MAX({col}) FROM {table}))")
 
+        run_file(conn, "db/schema/03_supporting_indexes.sql")
         run_file(conn, "db/views/analytics_views.sql")
         run_file(conn, "db/functions/portfolio_functions.sql")
         conn.commit()

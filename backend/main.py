@@ -7,14 +7,19 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from psycopg import OperationalError
 from psycopg.rows import dict_row
-from psycopg_pool import ConnectionPool
+from psycopg_pool import ConnectionPool, PoolTimeout
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-# check= re-validates a connection before use (Neon closes idle connections when it scales to zero)
-pool = ConnectionPool(os.environ["DATABASE_URL"], min_size=1, max_size=5, open=False,
-                      kwargs={"row_factory": dict_row}, check=ConnectionPool.check_connection)
+# Neon pooler endpoints reject statement_timeout startup options, so use the
+# matching direct endpoint for the API pool when the configured URL is pooled.
+database_url = os.environ["DATABASE_URL"].replace("-pooler.", ".", 1)
+# check= re-validates a connection before use (Neon closes idle connections when it scales to zero).
+pool = ConnectionPool(database_url, min_size=1, max_size=10, timeout=15, open=False,
+                      kwargs={"row_factory": dict_row, "options": "-c statement_timeout=10000"},
+                      check=ConnectionPool.check_connection)
 
 
 @asynccontextmanager
@@ -29,8 +34,17 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allo
 
 
 def rows(sql: str, params: dict | None = None) -> list[dict]:
-    with pool.connection() as conn:
-        return conn.execute(sql, params or {}).fetchall()
+    try:
+        with pool.connection() as conn:
+            return conn.execute(sql, params or {}).fetchall()
+    except (PoolTimeout, OperationalError):
+        raise HTTPException(503, "Database busy or unavailable")
+
+
+@app.get("/api/health")
+def health():
+    rows("SELECT 1")
+    return {"status": "ok"}
 
 
 @app.get("/api/summary")

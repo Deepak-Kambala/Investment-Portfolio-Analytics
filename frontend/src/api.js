@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export async function api(path, params = {}) {
+export async function api(path, params = {}, signal) {
   const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== "" && v != null));
-  const res = await fetch(`/api${path}${qs.size ? `?${qs}` : ""}`);
+  const res = await fetch(`/api${path}${qs.size ? `?${qs}` : ""}`, { signal });
   if (!res.ok) throw new Error(res.status === 404 ? "Not found" : `Request failed (${res.status})`);
   return res.json();
 }
@@ -10,16 +10,25 @@ export async function api(path, params = {}) {
 // { data, error, loading } for one GET; refetches when path or params change
 export function useApi(path, params) {
   const [state, set] = useState({ data: null, error: null, loading: true });
+  const [reloadVersion, setReloadVersion] = useState(0);
   const key = path + JSON.stringify(params ?? {});
+  const reload = useCallback(() => setReloadVersion((version) => version + 1), []);
   useEffect(() => {
-    let stale = false;
+    const controller = new AbortController();
     set((s) => ({ ...s, loading: true }));
-    api(path, params)
-      .then((data) => !stale && set({ data, error: null, loading: false }))
-      .catch((error) => !stale && set({ data: null, error, loading: false }));
-    return () => { stale = true; };
-  }, [key]);
-  return state;
+    const timer = setTimeout(() => {
+      api(path, params, controller.signal)
+        .then((data) => set({ data, error: null, loading: false }))
+        .catch((error) => {
+          if (error.name !== "AbortError") set((s) => ({ ...s, error, loading: false }));
+        });
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [key, reloadVersion]);
+  return { ...state, reload };
 }
 
 const usd0 = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
