@@ -21,7 +21,7 @@ export default function App() {
       <aside className="side">
         <div className="brand">
           <svg viewBox="0 0 8 8" width="32" height="32" shapeRendering="crispEdges" aria-hidden="true">
-            <path fill="#ffd25a" d="M1 5h2v2H1zM3 3h2v4H3zM5 1h2v6H5z" />
+            <path fill="#6d28d9" d="M1 5h2v2H1zM3 3h2v4H3zM5 1h2v6H5z" />
           </svg>
           <span>Portfolio<br />ledger</span>
         </div>

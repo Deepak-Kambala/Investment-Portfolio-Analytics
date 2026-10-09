@@ -57,9 +57,9 @@ export const Chart = ({ children, height = 240 }) => (
   <ResponsiveContainer width="100%" height={height}>{children}</ResponsiveContainer>
 );
 
-export const axis = { tick: { fontFamily: "VT323", fontSize: 16, fill: "#8196b5" }, stroke: "#35527a", tickLine: false };
+export const axis = { tick: { fontFamily: "VT323", fontSize: 16, fill: "#6b6b6b" }, stroke: "#242424", tickLine: false };
 export const tooltip = {
-  contentStyle: { background: "#0e1a2b", border: "2px solid #ffd25a", borderRadius: 0, fontFamily: "VT323", fontSize: 18 },
-  labelStyle: { color: "#ffd25a" },
-  cursor: { fill: "rgba(255,210,90,.08)" },
+  contentStyle: { background: "#ffffff", border: "2px solid #6d28d9", borderRadius: 0, fontFamily: "VT323", fontSize: 18, color: "#171717" },
+  labelStyle: { color: "#171717" },
+  cursor: { fill: "rgba(109,40,217,.12)" },
 };

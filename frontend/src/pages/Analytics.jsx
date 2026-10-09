@@ -4,7 +4,7 @@ import { compact, pct, usd, usdExact, useApi } from "../api.js";
 import { Async, Chart, DataTable, Panel, axis, tone, tooltip } from "../ui.jsx";
 
 const money = (v) => usd(v);
-const grid = <CartesianGrid stroke="#35527a" strokeDasharray="2 4" vertical={false} />;
+const grid = <CartesianGrid stroke="#b8b6af" strokeDasharray="2 4" vertical={false} />;
 const yAxis = <YAxis {...axis} width={56} tickFormatter={compact} />;
 
 function monthBars(data, color) {
@@ -43,7 +43,7 @@ function SecurityReturns() {
               <XAxis dataKey="price_date" {...axis} minTickGap={48} />
               <YAxis {...axis} width={56} tickFormatter={(v) => `${v}%`} />
               <Tooltip {...tooltip} formatter={(v) => `${v}%`} />
-              <Line type="stepAfter" dataKey="daily_return_pct" name="Daily return" stroke="#ffd25a" strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line type="stepAfter" dataKey="daily_return_pct" name="Daily return" stroke="#7c3aed" strokeWidth={2} dot={false} isAnimationActive={false} />
             </LineChart>
           </Chart>
         )}
@@ -76,11 +76,11 @@ export default function Analytics() {
           {(d) => (
             <Chart height={290}>
               <BarChart data={d} layout="vertical" margin={{ left: 8 }}>
-                <CartesianGrid stroke="#35527a" strokeDasharray="2 4" horizontal={false} />
+                <CartesianGrid stroke="#b8b6af" strokeDasharray="2 4" horizontal={false} />
                 <XAxis type="number" {...axis} />
                 <YAxis type="category" dataKey="symbol" {...axis} width={64} />
                 <Tooltip {...tooltip} formatter={(v, n) => (n === "Trades" ? v : money(v))} />
-                <Bar dataKey="trades" name="Trades" fill="#3ddbc0" isAnimationActive={false} />
+                <Bar dataKey="trades" name="Trades" fill="#7d8a2d" isAnimationActive={false} />
               </BarChart>
             </Chart>
           )}
@@ -96,8 +96,8 @@ export default function Analytics() {
                   <XAxis dataKey="trade_date" {...axis} minTickGap={48} />
                   {yAxis}
                   <Tooltip {...tooltip} formatter={money} />
-                  <Line type="stepAfter" dataKey="buy_volume" name="Buy" stroke="#3ddbc0" strokeWidth={2} dot={false} isAnimationActive={false} />
-                  <Line type="stepAfter" dataKey="sell_volume" name="Sell" stroke="#ff7d5c" strokeWidth={2} dot={false} isAnimationActive={false} />
+                  <Line type="stepAfter" dataKey="buy_volume" name="Buy" stroke="#7d8a2d" strokeWidth={2} dot={false} isAnimationActive={false} />
+                  <Line type="stepAfter" dataKey="sell_volume" name="Sell" stroke="#b04a35" strokeWidth={2} dot={false} isAnimationActive={false} />
                 </LineChart>
               </Chart>
             )}
@@ -125,11 +125,11 @@ export default function Analytics() {
         </Async>
       </Panel>
       <Panel title="Fees by month">
-        <Async state={fees}>{(d) => monthBars(d.by_month, "#ff7d5c")}</Async>
+        <Async state={fees}>{(d) => monthBars(d.by_month, "#b04a35")}</Async>
       </Panel>
       <div className="span2">
         <Panel title="Dividend income by month">
-          <Async state={divs}>{(d) => monthBars(d, "#ffd25a")}</Async>
+          <Async state={divs}>{(d) => monthBars(d, "#7c3aed")}</Async>
         </Panel>
       </div>
     </div>
