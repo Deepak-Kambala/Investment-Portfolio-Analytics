@@ -117,13 +117,16 @@ def transactions(account_id: int | None = None, security_id: int | None = None,
     if date_to:  # inclusive of the whole end day
         where.append("t.transaction_date < %(date_to)s::date + 1"); p["date_to"] = date_to
     clause = ("WHERE " + " AND ".join(where)) if where else ""
-    total = rows(f"SELECT COUNT(*) AS n FROM transactions t {clause}", p)[0]["n"]
     data = rows(f"""
-        SELECT t.transaction_id, t.account_id, s.symbol, t.transaction_type, t.quantity, t.price, t.amount, t.transaction_date
+        SELECT t.transaction_id, t.account_id, s.symbol, t.transaction_type, t.quantity, t.price, t.amount,
+               t.transaction_date, COUNT(*) OVER () AS total_count
         FROM transactions t LEFT JOIN securities s ON s.security_id = t.security_id
         {clause}
         ORDER BY t.transaction_date DESC, t.transaction_id DESC
         LIMIT %(limit)s OFFSET %(offset)s""", p)
+    total = data[0]["total_count"] if data else 0
+    for row in data:
+        del row["total_count"]
     return {"total": total, "rows": data}
 
 

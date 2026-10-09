@@ -341,12 +341,16 @@ Notes for the interview:
 | File | Role |
 |---|---|
 | `App.jsx` | Sidebar and page switch. Uses the URL hash (`#portfolio`), so no routing library is needed. |
-| `api.js` | `useApi(path, params)` returns `{data, error, loading}` and refetches when inputs change. Also the money, number and percent formatters. |
+| `api.js` | `useApi(path, params)` returns `{data, error, loading}` and refetches when inputs change. Requests are debounced and cancelled when filters change. Also the money, number and percent formatters. |
 | `ui.jsx` | `Panel`, `Stat`, `DataTable`, `Async` (loading/error wrapper), chart styling. |
 | `pages/*.jsx` | One file per screen. Each declares its data needs and renders. |
 | `styles.css` | Pixel theme: Press Start 2P for labels, VT323 for data, square corners, hard offset shadows, stepped chart lines, a 40-block buy/sell meter. |
 
 State is local (`useState`) and there is no global store, because no data is shared between pages.
+
+The Transactions page filters by account ID through `GET /api/transactions?account_id=...`.
+The endpoint returns the filtered page and total in one SQL round trip, which keeps account
+search and pagination responsive on the full dataset.
 
 ---
 
